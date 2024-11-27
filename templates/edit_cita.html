@@ -1,0 +1,33 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h2>Editar Cita</h2>
+
+<form action="/edit_cita/{{ cita[0] }}" method="POST">
+    <div class="form-group">
+        <label for="paciente_id">Seleccionar Paciente:</label>
+        <select name="paciente_id" id="paciente_id" class="form-control" required>
+            {% for paciente in pacientes %}
+            <option value="{{ paciente[0] }}" {% if paciente[0] == cita[2] %}selected{% endif %}>{{ paciente[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="doctor_id">Seleccionar Doctor:</label>
+        <select name="doctor_id" id="doctor_id" class="form-control" required>
+            {% for doctor in doctores %}
+            <option value="{{ doctor[0] }}" {% if doctor[0] == cita[1] %}selected{% endif %}>{{ doctor[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="fecha">Fecha:</label>
+        <input type="date" name="fecha" class="form-control" value="{{ cita[3].strftime('%Y-%m-%d') }}" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">Actualizar Cita</button>
+</form>
+
+{% endblock %}

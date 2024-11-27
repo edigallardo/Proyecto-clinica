@@ -1,0 +1,88 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h2>Agendar Nueva Cita</h2> 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="alert alert-danger">
+      <ul>
+        {% for category, message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endwith %}
+<form action="/agregar_cita" method="POST">
+    <div class="form-group">
+        <label for="paciente_id">Seleccionar Paciente:</label>
+        <select name="paciente_id" id="paciente_id" class="form-control" required>
+            <option value=""  selected>Elige un paciente</option>
+            {% if pacientes %}
+                {% for paciente in pacientes %}
+                    <option value="{{ paciente[0] }}">{{ paciente[1] }}</option>
+                {% endfor %}
+            {% else %}
+                <option value="" >No hay pacientes disponibles</option>
+            {% endif %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="doctor_id">Seleccionar Doctor:</label>
+        <select name="doctor_id" id="doctor_id" class="form-control" required>
+            <option value="" disabled selected>Elige un doctor</option>
+            {% if doctores %}
+                {% for doctor in doctores %}
+                    <option value="{{ doctor[0] }}">{{ doctor[1] }}</option>
+                {% endfor %}
+            {% else %}
+                <option value="" disabled selected>No hay doctores disponibles</option>
+            {% endif %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="fecha">Fecha:</label>
+        <input type="date" name="fecha" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">Agendar Cita</button>
+</form>
+
+<h2>Lista de Citas</h2>
+{% if citas %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Doctor</th>
+                <th>Paciente</th>
+                <th>Fecha</th>
+                <th>Opciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cita in citas %}
+                <tr>
+                    <td>{{ cita[0] }}</td>
+                    <td>{{ cita[1] }}</td>
+                    <td>{{ cita[2] }}</td>
+                    <td>{{ cita[3] }}</td>
+                    <td>
+                        <!-- Botón de editar -->
+                        <a href="/edit_cita/{{ cita[0] }}" class="btn btn-info btn-sm">Editar</a>
+
+                        <!-- Botón de eliminar -->
+                        <form action="{{ url_for('eliminar_cita', id=cita[0]) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No hay citas para mostrar.</p>
+{% endif %}
+{% endblock %}

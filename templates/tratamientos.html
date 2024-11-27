@@ -1,0 +1,42 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+<h2>Añadir Tratamiento</h2>
+<form action="/agregar_tratamiento" method="POST">
+    <div class="form-group">
+        <label for="cita_id">Cita ID</label>
+        <input type="number" name="cita_id" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="medicamento_id">Medicamento ID</label>
+        <input type="number" name="medicamento_id" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="dosis">Dosis</label>
+        <input type="text" name="dosis" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="duracion">Duración</label>
+        <input type="text" name="duracion" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-success">Añadir Tratamiento</button>
+</form>
+
+<h1>Lista de Tratamientos</h1>
+<ul class="list-group mb-3">
+    {% for tratamiento in tratamientos %}
+    <li class="list-group-item">
+        Cita: {{ tratamiento[1] }} - Medicamento: {{ tratamiento[2] }} - Dosis: {{ tratamiento[3] }} - Duración: {{ tratamiento[4] }}
+        <form action="/delete_tratamiento/{{ tratamiento[0] }}" method="POST" class="float-right ml-2">
+            <button class="btn btn-danger btn-sm">Eliminar</button>
+        </form>
+        <a href="/edit_tratamiento/{{ tratamiento[0] }}" class="btn btn-info btn-sm float-right">Editar</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<br>
+<a href="/">Volver al inicio</a>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h2>Editar Paciente</h2>
+<form action="/edit_paciente/{{ paciente[0] }}" method="POST">
+    <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input type="text" name="nombre" class="form-control" value="{{ paciente[1] }}" required>
+    </div>
+    <div class="form-group">
+        <label for="edad">Edad</label>
+        <input type="number" name="edad" class="form-control" value="{{ paciente[2] }}" required>
+    </div>
+    <div class="form-group">
+        <label for="direccion">Dirección</label>
+        <input type="text" name="direccion" class="form-control" value="{{ paciente[3] }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+</form>
+{% endblock %}
