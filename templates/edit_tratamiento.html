@@ -1,0 +1,24 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h2>Editar Tratamiento</h2>
+<form action="/edit_tratamiento/{{ tratamiento[0] }}" method="POST">
+    <div class="form-group">
+        <label for="cita_id">ID de Cita</label>
+        <input type="number" name="cita_id" class="form-control" value="{{ tratamiento[1] }}" required>
+    </div>
+    <div class="form-group">
+        <label for="medicamento_id">ID de Medicamento</label>
+        <input type="number" name="medicamento_id" class="form-control" value="{{ tratamiento[2] }}" required>
+    </div>
+    <div class="form-group">
+        <label for="dosis">Dosis</label>
+        <input type="text" name="dosis" class="form-control" value="{{ tratamiento[3] }}" required>
+    </div>
+    <div class="form-group">
+        <label for="duracion">Duración</label>
+        <input type="text" name="duracion" class="form-control" value="{{ tratamiento[4] }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+</form>
+{% endblock %}
