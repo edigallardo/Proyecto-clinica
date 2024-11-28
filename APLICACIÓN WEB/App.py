@@ -1,8 +1,27 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import mysql.connector
+from werkzeug.security import generate_password_hash, check_password_hash
+
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'eIorsH7Wnh'
+
+# Configuración de la conexión a la base de datos
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="edisonjimenez12",
+    database="clinica"
+)
+
+# Ruta principal
+@app.route('/')
+def index():
+    return render_template('login.html')
+
+@app.route('/inicio')
+def inicio():
+    return render_template('index.html')
 
 
 # Rutas para Doctores
@@ -87,6 +106,45 @@ def eliminar_tratamiento(id):
     cursor.execute("DELETE FROM Tratamientos WHERE id = %s", (id,))
     db.commit()
     return redirect(url_for('mostrar_tratamientos'))
+
+# Rutas para Pacientes
+@app.route('/pacientes')
+def mostrar_pacientes():
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Pacientes")
+    pacientes = cursor.fetchall()
+    return render_template('pacientes.html', pacientes=pacientes)
+
+@app.route('/agregar_paciente', methods=['POST'])
+def agregar_paciente():
+    nombre = request.form['nombre']
+    edad = request.form['edad']
+    direccion = request.form['direccion']
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO Pacientes (nombre, edad, direccion) VALUES (%s, %s, %s)", (nombre, edad, direccion))
+    db.commit()
+    return redirect(url_for('mostrar_pacientes'))
+
+@app.route('/edit_paciente/<int:id>', methods=['GET', 'POST'])
+def editar_paciente(id):
+    cursor = db.cursor()
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        edad = request.form['edad']
+        direccion = request.form['direccion']
+        cursor.execute("UPDATE Pacientes SET nombre = %s, edad = %s, direccion = %s WHERE id = %s", (nombre, edad, direccion, id))
+        db.commit()
+        return redirect(url_for('mostrar_pacientes'))
+    cursor.execute("SELECT * FROM Pacientes WHERE id = %s", (id,))
+    paciente = cursor.fetchone()
+    return render_template('edit_paciente.html', paciente=paciente)
+
+@app.route('/delete_paciente/<int:id>', methods=['POST'])
+def eliminar_paciente(id):
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM Pacientes WHERE id = %s", (id,))
+    db.commit()
+    return redirect(url_for('mostrar_pacientes'))
 
 # Rutas para Citas
 @app.route('/citas', methods=['GET', 'POST'])
@@ -258,8 +316,57 @@ def eliminar_medicamento(id):
     db.commit()
     return redirect(url_for('mostrar_medicamentos'))
 
+# Rutas para Registro e Inicio de Sesión
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        nombre_usuario = request.form['nombre_usuario']
+        contrasena = request.form['contrasena']
+        correo = request.form['correo']
+
+        hashed_password = generate_password_hash(contrasena)
+
+        cursor = db.cursor()
+        try:
+            cursor.execute("INSERT INTO usuario (nombre_usuario, contrasena, correo) VALUES (%s, %s, %s)",
+                           (nombre_usuario, hashed_password, correo))
+            db.commit()
+            flash('Registro exitoso! Ahora puedes iniciar sesión.', 'success')
+            return redirect(url_for('index'))
+        except mysql.connector.Error as err:
+            flash(f'Error: {err}', 'danger')
+        finally:
+            cursor.close()
+
+    return render_template('registro_usuario.html')
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        nombre_usuario = request.form['nombre_usuario']
+        contrasena = request.form['contrasena']
+
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM usuario WHERE nombre_usuario = %s", (nombre_usuario,))
+        user = cursor.fetchone()
+
+        if user and check_password_hash(user['contrasena'], contrasena):
+            session['user_id'] = user['id_usuario']
+            flash('Inicio de sesión exitoso!', 'success')
+            return redirect(url_for('inicio'))  # Redirige a inicio
+        else:
+            flash('Nombre de usuario o contraseña incorrectos.', 'danger')
+
+        cursor.close()
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    flash('Has cerrado sesión.', 'info')
+    return redirect(url_for('index'))
 
 
 
