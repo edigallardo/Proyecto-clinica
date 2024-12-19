@@ -1,0 +1,35 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+
+<h2>Añadir Paciente</h2>
+<form action="/agregar_paciente" method="POST">
+    <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input type="text" name="nombre" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="edad">Edad</label>
+        <input type="number" name="edad" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="direccion">Dirección</label>
+        <input type="text" name="direccion" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-success">Añadir Paciente</button>
+</form>
+
+<h1>Lista de Pacientes</h1>
+<ul class="list-group mb-3">
+    {% for paciente in pacientes %}
+    <li class="list-group-item">
+        {{ paciente[1] }} - {{ paciente[2] }} años
+        <form action="/delete_paciente/{{ paciente[0] }}" method="POST" class="float-right ml-2">
+            <button class="btn btn-danger btn-sm">Eliminar</button>
+        </form>
+        <a href="/edit_paciente/{{ paciente[0] }}" class="btn btn-info btn-sm float-right">Editar</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
